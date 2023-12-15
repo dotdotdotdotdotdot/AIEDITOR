@@ -3,6 +3,9 @@ import random
 from moviepy.editor import * 
 from moviepy.video.fx.all import crop
 from pytube import YouTube
+from PIL import Image
+import cv2
+import sys
 
 class VideoCreator:
     def create_tiktok(self, main_directory, attention_directory, output_folder, rest_folder):
@@ -20,20 +23,53 @@ class VideoCreator:
                     num_segments += 1  # Add an extra segment for the remainder
 
                 for i in range(num_segments):
+                    main_width = 1080
+                    main_height = 1920
+                    aspect_ratio = 2; # ändrar typ aspect ration på main videon
+
                     start_time = i * segment_duration
                     end_time = min((i + 1) * segment_duration, main_clip.duration)
-                    segment_main_clip = main_clip.subclip(start_time, end_time)
+
+                    # ------- Facecam shits --------
+                    # Load the cascade
+                    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+                    facecam_width = 250
+                    facecam_height = 125
+                    facecam_scale = 3
+
+                    frame = main_clip.get_frame(10) # Gets a frame from main vid
+                    fromarray = Image.fromarray(frame) # Gör framen till en "riktig bild"
+                    fromarray = fromarray.save("frame.png") # Sparar bilden (skitwack att man måste göra det men det funkar inte annars)
+
+                    # read and convert image
+                    img = cv2.imread('./frame.png')
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                    # Detect faces
+                    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+                    # Sparar mittpunkten för ansiktet
+                    for (x, y, w, h) in faces:
+                        midpoint_y = y+(h/2)
+                        midpoint_x = x+(w/2)
+
+                    facecam = main_clip.subclip(start_time, end_time).crop(x_center=midpoint_x, y_center=midpoint_y, width=facecam_width, height=facecam_height) # croppar ut ansiktet
+                    facecam_scaled = facecam.resize(facecam_scale) #gör den större
+                    facecam_scaled = facecam_scaled.set_position(('center',0), relative=True)
+
+                    # ----- NO MORE FACE ------ (kanske stoppa i egen funktion elle nåt)
+
+                    
+
+                    segment_main_clip = main_clip.subclip(start_time, end_time).resize(newsize=(main_width*aspect_ratio,(2*(main_height/3)))) # ändrar heighten till 2/3 av hela
+                    segment_main_clip_face = CompositeVideoClip([segment_main_clip, facecam_scaled])
+                    segment_main_clip_cropped = crop(segment_main_clip_face, x1=((main_width*aspect_ratio-main_width)/2), width=main_width)
 
                     # Segment the attention video
-                    segment_attention_clip = attention_clip.subclip(0, min(segment_duration, attention_clip.duration)).resize(height=segment_main_clip.h / 3)
-
-                    # Position the attention clip
-                    x_position = segment_main_clip.w - segment_attention_clip.w
-                    y_position = segment_main_clip.h - segment_attention_clip.h
-                    positioned_attention_clip = segment_attention_clip.set_position((x_position, y_position))
+                    segment_attention_clip = attention_clip.subclip(0, min(segment_duration, attention_clip.duration)).resize(newsize=(main_width,(main_height/3))) # ändrar heighten till 1/3 av hela
 
                     # Composite the videos together
-                    final_clip = CompositeVideoClip([segment_main_clip, positioned_attention_clip], size=(1080, 1920))
+                    final_clip = clips_array([[segment_main_clip_cropped], [segment_attention_clip]])
                     output_filename = f"{self.next_file_number(output_folder)}.mp4"
                     output_path = os.path.join(output_folder, output_filename)
                     final_clip.write_videofile(output_path, codec="libx264", fps=24)
