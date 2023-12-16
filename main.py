@@ -35,8 +35,8 @@ class VideoCreator:
                     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
                     facecam_width = 250
-                    facecam_height = 125
-                    facecam_scale = 3
+                    facecam_height = 100
+                    facecam_scale = 4
 
                     frame = main_clip.get_frame(10) # Gets a frame from main vid
                     fromarray = Image.fromarray(frame) # Gör framen till en "riktig bild"
@@ -55,7 +55,7 @@ class VideoCreator:
 
                     facecam = main_clip.subclip(start_time, end_time).crop(x_center=midpoint_x, y_center=midpoint_y, width=facecam_width, height=facecam_height) # croppar ut ansiktet
                     facecam_scaled = facecam.resize(facecam_scale) #gör den större
-                    facecam_scaled = facecam_scaled.set_position(('center',0), relative=True)
+                    facecam_scaled = facecam_scaled.set_position(('center',0.01), relative=True)
 
                     # ----- NO MORE FACE ------ (kanske stoppa i egen funktion elle nåt)
 
@@ -66,13 +66,13 @@ class VideoCreator:
                     segment_main_clip_cropped = crop(segment_main_clip_face, x1=((main_width*aspect_ratio-main_width)/2), width=main_width)
 
                     # Segment the attention video
-                    segment_attention_clip = attention_clip.subclip(0, min(segment_duration, attention_clip.duration)).resize(newsize=(main_width,(main_height/3))) # ändrar heighten till 1/3 av hela
+                    segment_attention_clip = attention_clip.subclip(start_time, end_time).resize(newsize=(main_width,(main_height/3))) # ändrar heighten till 1/3 av hela
 
                     # Composite the videos together
                     final_clip = clips_array([[segment_main_clip_cropped], [segment_attention_clip]])
                     output_filename = f"{self.next_file_number(output_folder)}.mp4"
                     output_path = os.path.join(output_folder, output_filename)
-                    final_clip.write_videofile(output_path, codec="libx264", fps=24)
+                    final_clip.write_videofile(output_path, codec="libx265", fps=24)
 
             # Move remaining parts of the main clip to the rest folder
             if main_clip.duration % segment_duration != 0:
