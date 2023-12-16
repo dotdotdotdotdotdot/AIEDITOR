@@ -122,10 +122,10 @@ class VideoDownloader():
 
 class TxT():
     def writer(self):
-        with open('videos.txt', 'w') as file:
+        with open('videos.txt', 'a') as file:
             link = input("paste link:")
-            categorized_link = self.categorize(link)
-            file.write(categorized_link + '\n')
+            category, categorized_link = self.categorize(link)
+            file.write(f"{category}{categorized_link}\n")
 
     def categorize(self, link):
         choice = input("main or ret link?")
@@ -133,9 +133,9 @@ class TxT():
             print("no")
             return
         elif choice == "main":
-            return "Main: " + link
+            return "Main: ",link
         elif choice == "ret":
-            return "Ret: " + link
+            return "Ret: ",link
     
 
 def main():
