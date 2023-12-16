@@ -127,12 +127,6 @@ class TxT():
             categorized_link = self.categorize(link)
             file.write(categorized_link + '\n')
 
-    def read(self):
-        with open('video.txt', 'r') as file:
-            lines = file.readlines()
-            for line in lines:
-                print(line.strip())
-
     def categorize(self, link):
         choice = input("main or ret link?")
         if choice not in ["main", "ret"]:
@@ -160,7 +154,7 @@ def main():
     menu = menu_file.read()
 
     def AddtoTxt():
-        txt.read()
+        txt.writer()
     
     def DownloadfromTxt():
         downloader.download_from_file(videos, main_videos_path, retention_videos_path)
