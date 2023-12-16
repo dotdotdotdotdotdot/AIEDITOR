@@ -6,6 +6,7 @@ from pytube import YouTube
 from PIL import Image
 import cv2
 
+
 class VideoCreator:
     def create_tiktok(self, main_directory, attention_directory, output_folder, rest_folder):
         main_videos = self.get_all_videos(main_directory)
@@ -33,8 +34,8 @@ class VideoCreator:
                     title_text = title_text.set_position(('center', 0.85), relative=True).set_duration(10)
 
                     facecam_width = 250
-                    facecam_height = 125
-                    facecam_scale = 3
+                    facecam_height = 100
+                    facecam_scale = 4
 
                     facecam_scaled = self.get_facecam(facecam_width, facecam_height, facecam_scale, start_time, end_time, main_clip)
                     segment_main_clip = main_clip.subclip(start_time, end_time).resize(newsize=(main_width*aspect_ratio,(2*(main_height/3)))) # ändrar heighten till 2/3 av hela
@@ -118,10 +119,6 @@ class VideoDownloader():
             os.makedirs(path)
         existing_files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         return len(existing_files) + 1
-    
-class VideoUploader():
-    def uploaded():
-        NotImplementedError()
 
 class TxT():
     def writer(self):
@@ -150,7 +147,6 @@ class TxT():
 def main():
     creator = VideoCreator()
     downloader = VideoDownloader()
-    uploader = VideoUploader()
     txt = TxT()
 
     videos = './videos.txt'
@@ -172,12 +168,6 @@ def main():
     def EditfromDownloads():
         creator.create_tiktok(main_videos_path, retention_videos_path, edited_path, rest_folder)
 
-    def UploadfromEdited():
-        NotImplemented
-
-    def AutoMod():
-        NotImplemented
-
     loop = True
     while loop:
         print(menu)
@@ -193,12 +183,6 @@ def main():
             loop = False
         elif choice == '3':
             EditfromDownloads()
-            loop = False
-        elif choice == '4':
-            UploadfromEdited()
-            loop = False
-        elif choice == '5':
-            AutoMod()
             loop = False
 
 if __name__  == "__main__":
