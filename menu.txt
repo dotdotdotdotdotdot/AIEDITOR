@@ -1,4 +1,4 @@
 (1) Write to TXT-file
 (2) Download from TXT-file
-(3) Edit from Downloads-folder
-(4) Upload from Edited-forlder
+(3) Edit with attention vid
+(4) Edit with blurry borders
