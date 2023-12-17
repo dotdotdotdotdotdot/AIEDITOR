@@ -105,6 +105,7 @@ class VideoCreator2:
     def create_tiktok(self, main_directory, music_dir, output_folder, rest_folder, title):
         main_videos = self.get_all_videos(main_directory)
         main_musics = self.get_all_musics(music_dir)
+        i_music = 0
 
         for main_video_path in main_videos:
             main_clip = VideoFileClip(main_video_path)
@@ -124,8 +125,17 @@ class VideoCreator2:
     
                     start_time = i * segment_duration
                     end_time = min((i + 1) * segment_duration, main_clip.duration)
+                
+
+                    if(music_clip.duration >= min((i_music + 1) * segment_duration, main_clip.duration)):
+                        music_start = i_music * segment_duration
+                        music_end = min((i_music + 1) * segment_duration, main_clip.duration)
+                    elif(music_clip.duration < end_time):
+                        i_music = 0;
+                    
+                    i_music = i_music+1;
     
-                    title_text = TextClip(title + "\npart " + str(i+1), font='Impact',color='black',fontsize=100, bg_color='white')
+                    title_text = TextClip(title + "\npart " + str(i+1), font='Impact',color='black',fontsize=90, bg_color='white')
                     title_text = title_text.set_position(('center', 0.7), relative=True).set_duration(10)
     
                     facecam_width = 250
@@ -134,7 +144,7 @@ class VideoCreator2:
     
                     facecam_scaled = self.get_facecam(facecam_width, facecam_height, facecam_scale, start_time, end_time, main_clip, 0.03)
                     
-                    segment_music_clip = music_clip.subclip(start_time, end_time).resize(newsize=(1,1))
+                    segment_music_clip = music_clip.subclip(music_start, music_end).resize(newsize=(1,1))
                     segment_music_clip_lower = volumex(segment_music_clip, 0.08)
     
                     segment_main_clip = main_clip.subclip(start_time, end_time).resize(width=main_width*aspect_ratio)
